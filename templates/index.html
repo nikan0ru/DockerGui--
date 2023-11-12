@@ -1,0 +1,78 @@
+{% extends 'base.html' %} {% block head %} {% endblock %} {% block body %}
+<h1 class="text-center">DockerGui--</h1>
+<hr />
+<button type="button" class="btn bg-gradient btn-success position-relative start-50 translate-middle w-25 mt-4"
+  data-toggle="modal" data-target="#myModal"><strong>
+    Créer
+  </strong>
+</button>
+
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title text-center">Creer Un Conteneur</h4>
+        <button type="button" class="btn btn-danger close" data-dismiss="modal">
+          &times;
+        </button>
+      </div>
+      <div class="modal-body justify-content-center">
+        <form class="text-center form-group d-flex flex-column justify-content-between" method="POST"
+          action="/Creer/<Base_Image><Container_name>">
+          <label class="form-label">
+            Selectionner Un image de base :
+            <select id="select" name="Base_Image" class="form-control text-center ">
+              {% for image in images %}
+              <option value="{{ image.id }}">{{ image.tags }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="form-label">
+            Nom de conteneur :
+            <input type="text" class="form-control text-center" name="Container_name" />
+          </label>
+          <button class="btn btn-primary" type="submit">Creer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container table-responsive">
+  <table class="table table-bordered border-primary table-sm table-hover table-striped ">
+    <thead>
+      <tr class="text-center">
+        <th scope="col" class="w-40" hidden>Identifiant</th>
+        <th scope="col" class="w-25 bg-primary bg-gradient text-light">Nom de Conteneur</th>
+        <th scope="col" class="w-30 bg-primary bg-gradient text-light">Statut</th>
+        <th scope="col" class="w-25 bg-primary bg-gradient text-light">Action</th>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      {% for container in containers %}
+      <tr class="text-center align-middle ">
+        <td hidden>{{ container.short_id }}</td>
+        <td class="fs-4">{{ container.name }}</td>
+        <td class="status fs-4">{{ container.status }}</td>
+        <td class="col sm-5">
+          <div class="btn-group">
+            <form action="{{ url_for('Demarrer', container_id=container.short_id) }}" method="POST">
+              <input name="{{container.short_id}}" class="btn btn-primary bg-gradient m-2" type="submit"
+                value="Démarrer" />
+            </form>
+            <form action="{{ url_for('Arreter', container_id=container.short_id) }}" method="POST">
+              <input name="{{container.short_id}}" class="btn btn-secondary bg-gradient m-2" type="submit"
+                value="Arrêter" />
+            </form>
+            <form onsubmit="validateForm(this)" action="{{ url_for('Supprimer', container_id=container.short_id) }}"
+              method="POST">
+              <input onclick="" name="{{container.short_id}}" class="btn btn-danger bg-gradient m-2" type="submit"
+                value="Supprimer" />
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
