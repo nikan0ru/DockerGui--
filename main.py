@@ -44,16 +44,22 @@ def Arreter(container_id):
     except docker.errors.APIError as e:
         return redirect(url_for('error'), error=e)
 
-@app.route('/Supprimer/<container_id>', methods=['POST'])
+  @app.route('/Supprimer/<container_id>', methods=['POST'])
 def Supprimer(container_id):
-    client = docker.from_env()
-    container = client.containers.get(container_id)
-    if container.attrs['State']['Status'] != 'running':
-        container.remove()
+    try:
+        client = docker.from_env()
+        container = client.containers.get(container_id)
+        
+        if container.status == 'running':
+            container.stop()
+            
+        container.remove(force=True)
         return redirect(url_for('index'))
-    else:
+        
+    except docker.errors.NotFound:
         return redirect(url_for('index'))
-   
+    except docker.errors.APIError as e:
+        return f"Error deleting container: {e}", 500 
 
 if __name__ == '__main__':
     app.run(debug=True)
